@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.debug</groupId>
+  <artifactId>dashboard</artifactId>
+  <version>0.9-SNAPSHOT</version>
+  <packaging>war</packaging>
+  <name>JEE App Server Debugging and Analysis Tool</name>
+  <description>Tools for debugging web app servers</description>
+  <build>
+    <finalName>debug</finalName>
+  </build>
+</project>

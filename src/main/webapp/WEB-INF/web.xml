@@ -1,0 +1,5 @@
+<web-app>
+  <display-name>A debug war</display-name>
+  <description>A portal containing links to JEE debugging functions</description>
+  <distributable/>
+</web-app>
