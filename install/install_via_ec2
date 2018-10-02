@@ -15,7 +15,7 @@ export PATH=$PATH:~/.local/bin
 ec2_instance_name=artofwar01
 cloudformation_template=cloudformation/single_ec2_instance_with_ansible_launcher.yaml
 # If you don't want to create an access key, set "create" to false here and specify the access key nam
-create_new_ec2_access_key=false
+create_new_ec2_access_key=true
 aws_ec2_access_key_name=ec2_key_artofwar02
 aws_ec2_access_keyfile_name=./artofwar02.pem
 aws_cloudformation_stack_name=cf-artofwar-stack01
@@ -112,8 +112,10 @@ create_ec2_instance() {
 # A cleanup routine.  The stack can also be deleted from the AWS console.
 #
 delete_ec2_instance() {
+   echo -e "\n  [`basename "$0"`]: delete_ec2_instance(): Deleting stack "$aws_cloudformation_stack_name" \n\n"
   aws cloudformation delete-stack --stack-name $aws_cloudformation_stack_name
 }
+
 
 # Start of main program
 
@@ -121,8 +123,6 @@ delete_ec2_instance() {
 if [ $# -gt 0 ]; then
   $@ 
 fi
-
-exit 1
 
 if [ "$create_new_ec2_access_key" = "true" ]; then
   create_ec2_access_key
