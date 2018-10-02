@@ -59,7 +59,7 @@ Resources:
           sudo pip install ansible
           sudo yum install -y git
           sudo -u ec2-user git clone https://github.com/cloudomatic/ArtOfWar /home/ec2-user/ArtOfWar
-          ansible-playbook -i localhost  /home/ec2-user/ArtOfWar/install/ansible/install.yaml -vvv 
+          ansible-playbook -i localhost  /home/ec2-user/ArtOfWar/install/ansible/install.yaml -vvv >> /home/ec2-user/ansible_install.log
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:

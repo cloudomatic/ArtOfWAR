@@ -12,13 +12,13 @@
 export PATH=$PATH:~/.local/bin
 
 ###### Change these if needed
-ec2_instance_name=artofwar01
+ec2_instance_name=artofwar04
 cloudformation_template=cloudformation/single_ec2_instance_with_ansible_launcher.yaml
 # If you don't want to create an access key, set "create" to false here and specify the access key nam
 create_new_ec2_access_key=true
-aws_ec2_access_key_name=ec2_key_artofwar02
-aws_ec2_access_keyfile_name=./artofwar02.pem
-aws_cloudformation_stack_name=cf-artofwar-stack01
+aws_ec2_access_key_name=ec2_key_artofwar04
+aws_ec2_access_keyfile_name=./artofwar04.pem
+aws_cloudformation_stack_name=cf-artofwar-stack04
 ec2_ami_id=ami-6b8cef13
 ec2_instance_ssh_username=ec2-user
 
@@ -43,7 +43,7 @@ create_ec2_access_key() {
     exit 1
   fi
 
-  echo -e "\n\n  Creating the EC2 access key \n\n"
+  echo -e "\n  [`basename "$0"`] create_ec2_access_key(): Creating the EC2 access key \n"
   # Create the key in AWS
   aws ec2 create-key-pair --key-name $aws_ec2_access_key_name --output text> $aws_ec2_access_keyfile_name.tmp
   
@@ -95,7 +95,7 @@ create_ec2_instance() {
     echo -e "\n\n [`basename "$0"`]: create_ec2_instance(): Error: Could not validate the EC2 keyfilename <$aws_ec2_access_keyfile_name>.  Update the install shell script with the appropriate EC2 access key and key file name to create and access the <$ec2_instance_name> instance. \n\n"
     exit 3
   fi
-  aws_cloudformation_create_stack_command=`echo aws cloudformation create-stack --stack-name $aws_cloudformation_stack_name --template-body "file://$cloudformation_template" --parameters ParameterKey=KeyName,ParameterValue=$aws_ec2_access_key_name ParameterKey=InstanceName,ParameterValue=$ec2_instance_name`
+  aws_cloudformation_create_stack_command=`echo aws cloudformation create-stack --stack-name $aws_cloudformation_stack_name --template-body "file://$cloudformation_template" --parameters ParameterKey=KeyName,ParameterValue=$aws_ec2_access_key_name ParameterKey=InstanceName,ParameterValue=$ec2_instance_name ParameterKey=AMIId,ParameterValue=$ec2_ami_id`
   echo -e "\n [`basename "$0"`]: create_ec2_instance(): Creating the AWS cloudformation stack with command: $aws_cloudformation_create_stack_command"
   $aws_cloudformation_create_stack_command 
 
