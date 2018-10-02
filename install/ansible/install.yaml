@@ -31,16 +31,20 @@
       url: "{{ tomcat_download_url }}"
       dest: "/var/tmp/{{ tomcat_version_label }}.zip"
 
-  - name: Make Java 1.8 the default JDK
-    become: true
-    alternatives: 
-      link: /usr/bin/java
-      name: java
-      path: /usr/lib/jvm/java-1.8.0/bin/java
-    alternatives:
-      link: /usr/bin/javac
-      name: javac
-      path: /usr/lib/jvm/java-1.8.0/bin/javac
+# Removing this to make the install less dependent on default OS settings
+#  - name: Make Java 1.8 the default JDK
+#    become: true
+#    alternatives: 
+#      link: /usr/bin/java
+#      name: java
+#      path: /usr/lib/jvm/java-1.8.0/bin/java
+#
+#  - name: Make Java 1.8 the default compiler
+#    become: true
+#    alternatives:
+#      link: /usr/bin/javac
+#      name: javac
+#      path: /usr/lib/jvm/java-1.8.0/bin/javac
 
   - name: Unpack Maven
     become: true
@@ -81,12 +85,20 @@
       src: "/opt/{{ tomcat_version_label }}"
       dest: /opt/apache-tomcat
       state: link
+
+  - name: Configure Apache Tomcat
+    copy:
+      dest: /opt/apache-tomcat/bin/setup.sh
+      content: 'JAVA_HOME=/usr/lib/jvm/java-1.8.0'
   
   - name: Build WAR
-    command: mvn clean install
+    shell: mvn -X clean install > maven_install.out 2> maven_install.err
     args:
       chdir: /home/ec2-user/ArtOfWar
       creates: /home/ec2-user/ArtOfWar/target/debug.war
+    environment:
+      JAVA_HOME: /usr/lib/jvm/java-1.8.0
+      PATH: /opt/maven/bin:{{ ansible_env.PATH }}
 
   - name: Copy WAR to Tomcat
     copy: 

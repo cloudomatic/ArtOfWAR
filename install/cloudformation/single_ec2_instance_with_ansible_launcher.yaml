@@ -58,8 +58,8 @@ Resources:
           # We want to bootstrap Ansible and Git in order to download and execute the playbook
           sudo pip install ansible
           sudo yum install -y git
-          sudo -u ec2-user git clone https://github.com/cloudomatic/ArtOfWar /home/ec2-user/ArtOfWar
-          ansible-playbook -i localhost  /home/ec2-user/ArtOfWar/install/ansible/install.yaml -vvv >> /home/ec2-user/ansible_install.log
+          sudo -u ec2-user /usr/bin/git clone https://github.com/cloudomatic/ArtOfWar /home/ec2-user/ArtOfWar
+          sudo -u ec2-user /usr/local/bin/ansible-playbook /home/ec2-user/ArtOfWar/install/ansible/install.yaml -vvv >> /home/ec2-user/ansible_install.out 2>>  /home/ec2-user/ansible_install.err
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -70,6 +70,12 @@ Resources:
         ToPort: '22'
         CidrIp:
           Ref: SSHLocation
+      - IpProtocol: tcp
+        FromPort: '8080'
+        ToPort: '8080'
+        CidrIp:
+          Ref: SSHLocation
+
 Outputs:
   InstanceId:
     Description: InstanceId of the newly created EC2 instance

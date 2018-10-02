@@ -12,13 +12,13 @@
 export PATH=$PATH:~/.local/bin
 
 ###### Change these if needed
-ec2_instance_name=artofwar04
+ec2_instance_name=artofwar05
 cloudformation_template=cloudformation/single_ec2_instance_with_ansible_launcher.yaml
 # If you don't want to create an access key, set "create" to false here and specify the access key nam
 create_new_ec2_access_key=true
-aws_ec2_access_key_name=ec2_key_artofwar04
-aws_ec2_access_keyfile_name=./artofwar04.pem
-aws_cloudformation_stack_name=cf-artofwar-stack04
+aws_ec2_access_key_name=ec2_key_artofwar05
+aws_ec2_access_keyfile_name=./artofwar05.pem
+aws_cloudformation_stack_name=cf-artofwar-stack05
 ec2_ami_id=ami-6b8cef13
 ec2_instance_ssh_username=ec2-user
 
@@ -122,6 +122,7 @@ delete_ec2_instance() {
 # Enable CLI access to any function
 if [ $# -gt 0 ]; then
   $@ 
+  exit 1
 fi
 
 if [ "$create_new_ec2_access_key" = "true" ]; then
