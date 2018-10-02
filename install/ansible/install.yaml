@@ -1,17 +1,92 @@
-- name: Install OS packages
-  yum: 
-    name: "{{ item }}"
-    state: present
-  with_items:
-   - git
-   - unzip
-   - java-1.8.0-devel
+- name: Install Apache Tomcat with the target WAR
+  hosts: localhost
+  become: false
 
-# The current AWS package for Maven seems to revert back to JDK 1.7 so a manual download is required
-- name: Download Maven
-  get_url: 
-    url: http://us.mirrors.quenda.co/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip
-    dest: /var/tmp/apache-maven-3.5.4-bin.zip
+  tasks:
 
+  - name: Install OS packages
+    yum: 
+      name: "{{ item }}"
+      state: present
+    become: true
+    with_items:
+     - git
+     - unzip
+     - java-1.8.0-devel
+
+  - name: Make Java 1.8 the default JDK
+    become: true
+    alternatives: 
+      link: /usr/bin/java
+      name: java
+      path: /usr/lib/jvm/java-1.8.0/bin/java
+    alternatives:
+      link: /usr/bin/javac
+      name: javac
+      path: /usr/lib/jvm/java-1.8.0/bin/javac
+
+
+  # The current AWS package for Maven seems to revert back to JDK 1.7 so a manual download is required
+  - name: Download Maven
+    get_url: 
+      url: http://us.mirrors.quenda.co/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip
+      dest: /var/tmp/apache-maven-3.5.4-bin.zip
+
+  - name: Unpack Maven
+    become: true
+    unarchive:
+      src: /var/tmp/apache-maven-3.5.4-bin.zip
+      dest: /opt
+      mode: ugo+rx
+      owner: ec2-user
+      group: ec2-user
+
+  - name: Link Maven version as default
+    become: true
+    file:
+      src: /opt/apache-maven-3.5.4
+      dest: /opt/maven
+      state: link
+
+  - name: Set Maven path
+    become: true
+    copy:
+      dest: /etc/profile.d/maven.sh
+      content: 'PATH=$PATH:/opt/maven/bin'
+
+  - name: Download Apache Tomcat
+    get_url: 
+      url: http://apache.mirrors.pair.com/tomcat/tomcat-8/v8.5.34/bin/apache-tomcat-8.5.34.zip
+      dest: /var/tmp/apache-tomcat-8.5.34.zip
+
+  - name: Unpack Maven
+    become: true
+    unarchive:
+      src: /var/tmp/apache-tomcat-8.5.34.zip
+      dest: /opt
+      mode: ugo+rx
+      owner: ec2-user
+      group: ec2-user
+
+  - name: Link Maven version as default
+    become: true
+    file:
+      src: /opt/apache-tomcat-8.5.34
+      dest: /opt/apache-tomcat
+      state: link
+  
+  - name: Build WAR
+    command: mvn clean install
+    args:
+      chdir: /home/ec2-user/ArtOfWar
+      creates: /home/ec2-user/ArtOfWar/target/debug.war
+
+  - name: Copy WAR to Tomcat
+    copy: 
+      src:  /home/ec2-user/ArtOfWar/target/debug.war
+      dest: /opt/apache-tomcat/webapps/debug.war
+      mode: ugo+rx
+
+  - name: Start Tomcat
+    command: nohup /opt/apache-tomcat/bin/startup.sh >> /opt/apache-tomcat/logs/startup.log &
     
-
