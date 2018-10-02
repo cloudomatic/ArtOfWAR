@@ -8,15 +8,18 @@
 #
 
 
-# Make sure to set the path to the AWS CLI 
+###### Make sure to set the path to the AWS CLI 
 export PATH=$PATH:~/.local/bin
 
-# Change these if needed
+###### Change these if needed
 ec2_instance_name=artofwar01
 cloudformation_template=cloudformation/single_ec2_instance_with_ansible_launcher.yaml
-aws_ec2_access_key_name=ec2_key_artofwar01
-aws_ec2_access_keyfile_name=./artofwar01.pem
+# If you don't want to create an access key, set "create" to false here and specify the access key nam
+create_new_ec2_access_key=false
+aws_ec2_access_key_name=ec2_key_artofwar02
+aws_ec2_access_keyfile_name=./artofwar02.pem
 aws_cloudformation_stack_name=cf-artofwar-stack01
+ec2_ami_id=ami-6b8cef13
 ec2_instance_ssh_username=ec2-user
 
 #
@@ -31,13 +34,13 @@ validate_aws_cli() {
   fi 
 }
 
-
 # 
 #  Use this routine to create an EC2 access key.  
 #
 create_ec2_access_key() {
   if ! validate_aws_cli; then
     echo -e "\n\n [`basename "$0"`] create_ec2_access_key(): Error: Could not validate the AWS EC2 CLI.  Validate that the "aws" command is in the current PATH. \n\n"
+    exit 1
   fi
 
   echo -e "\n\n  Creating the EC2 access key \n\n"
@@ -64,33 +67,36 @@ get_ec2_instance_public_ip_address() {
   instance_name=$1
 
   if ! validate_aws_cli; then
-    echo -e "\n\n [`basename "$0"`]: get_ec2_instance_public_ip_address:  Error: Could not validate the AWS EC2 CLI.  Validate that the "aws" command is in the current PATH. \n\n"
+    echo -e "\n\n [`basename "$0"`]: get_ec2_instance_public_ip_address():  Error: Could not validate the AWS EC2 CLI.  Validate that the "aws" command is in the current PATH. \n\n"
+    exit 1
   fi
   ip_address=`aws ec2 describe-instances --filters "Name=tag-value,Values=$instance_name" --query Reservations[0].Instances[0].PublicIpAddress | sed 's/\"//g'`
   if [ x$ip_address == xnull ] ||  [ x$ip_address == x ]; then
     echo "ERROR: get_instance_public_ip_address(): Could not retrieve an ip address for instance: [$instance_name]"
-    exit 1
+    exit 2 
   fi
   echo $ip_address
 }
+
 
 #
 # Create an EC2 instance using the cloudformation template
 #
 create_ec2_instance() {
   if ! validate_aws_cli; then 
-    echo -e "\n\n [`basename "$0"`] Error: Could not validate the AWS EC2 CLI.  Validate that the "aws" command is in the current PATH. \n\n"
+    echo -e "\n\n [`basename "$0"`]: create_ec2_instance(): Error: Could not validate the AWS EC2 CLI.  Validate that the "aws" command is in the current PATH. \n\n"
+    exit 1
   fi
   if [ ! -r $cloudformation_template ]; then
-    echo -e "\n\n [`basename "$0"`] Error: Could not validate the cloudformation template <$cloudformation_template> \n\n"
+    echo -e "\n\n [`basename "$0"`] create_ec2_instance(): Error: Could not validate the cloudformation template <$cloudformation_template> \n\n"
     exit 2 
   fi
   if [ ! -r $aws_ec2_access_keyfile_name ]; then
-    echo -e "\n\n [`basename "$0"`] Error: Could not validate the EC2 keyfilename <$aws_ec2_access_keyfile_name>.  Update the install shell script with the appropriate EC2 access key and key file name to create and access the <$ec2_instance_name> instance. \n\n"
+    echo -e "\n\n [`basename "$0"`]: create_ec2_instance(): Error: Could not validate the EC2 keyfilename <$aws_ec2_access_keyfile_name>.  Update the install shell script with the appropriate EC2 access key and key file name to create and access the <$ec2_instance_name> instance. \n\n"
     exit 3
   fi
   aws_cloudformation_create_stack_command=`echo aws cloudformation create-stack --stack-name $aws_cloudformation_stack_name --template-body "file://$cloudformation_template" --parameters ParameterKey=KeyName,ParameterValue=$aws_ec2_access_key_name ParameterKey=InstanceName,ParameterValue=$ec2_instance_name`
-  echo -e "\n [`basename "$0"`]Creating the AWS cloudformation stack with command: $aws_cloudformation_create_stack_command"
+  echo -e "\n [`basename "$0"`]: create_ec2_instance(): Creating the AWS cloudformation stack with command: $aws_cloudformation_create_stack_command"
   $aws_cloudformation_create_stack_command 
 
   sleep 15
@@ -111,6 +117,15 @@ delete_ec2_instance() {
 
 # Start of main program
 
-create_ec2_access_key
-#create_ec2_instance
+# Enable CLI access to any function
+if [ $# -gt 0 ]; then
+  $@ 
+fi
+
+exit 1
+
+if [ "$create_new_ec2_access_key" = "true" ]; then
+  create_ec2_access_key
+fi
+create_ec2_instance
 #delete_ec2_instance

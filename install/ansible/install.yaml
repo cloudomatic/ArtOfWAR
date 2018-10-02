@@ -1,0 +1,17 @@
+- name: Install OS packages
+  yum: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+   - git
+   - unzip
+   - java-1.8.0-devel
+
+# The current AWS package for Maven seems to revert back to JDK 1.7 so a manual download is required
+- name: Download Maven
+  get_url: 
+    url: http://us.mirrors.quenda.co/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip
+    dest: /var/tmp/apache-maven-3.5.4-bin.zip
+
+    
+

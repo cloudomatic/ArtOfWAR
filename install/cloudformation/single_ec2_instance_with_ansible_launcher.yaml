@@ -55,17 +55,11 @@ Resources:
         Fn::Base64: !Sub |     # No more Fn::Join needed
           #!/bin/bash
           # Note to user that this will log to /var/log/cloud-init-output.log
-          echo 'install successful' > /var/tmp/results.out
-          #yum install -y git java-1.8.0-devel
-          #yum remove -y java-1.7.0-openjdk
-          #/usr/bin/curl -O http://us.mirrors.quenda.co/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.zip
-          #/bin/cp -f apache-maven-3.5.4-bin.zip /var/tmp
-          #sudo -u ec2-user unzip /var/tmp/apache-maven-3.5.4-bin.zip -d /home/ec2-user/
-          #sudo -u ec2-user /bin/touch /home/ec2-user/.bashrc
-          #echo 'export PATH=/home/ec2-user/apache-maven-3.5.4/bin/:$PATH' >> /home/ec2-user/.bashrc
-          #echo 'export MAVEN_HOME=/home/ec2-user/apache-maven-3.5.4' >>  /home/ec2-user/.bashrc
-          #mvn --version
-          #sudo -u ec2-user git clone https://github.com/cloudomatic/ArtOfWar /home/ec2-user/ArtOfWar
+          # We want to bootstrap Ansible and Git in order to download and execute the playbook
+          sudo pip install ansible
+          sudo yum install -y git
+          sudo -u ec2-user git clone https://github.com/cloudomatic/ArtOfWar /home/ec2-user/ArtOfWar
+          ansible-playbook -i localhost  /home/ec2-user/ArtOfWar/install/ansible/install.yaml -vvv 
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
