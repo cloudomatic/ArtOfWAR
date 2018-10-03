@@ -43,6 +43,11 @@ create_ec2_access_key() {
     exit 1
   fi
 
+  if ! -r $aws_ec2_access_keyfile_name; then
+    echo -e "\n\n [`basename "$0"`] create_ec2_access_key(): EC2 access keyfile detected, skipping new key creation \n"
+    return
+  fi
+
   echo -e "\n  [`basename "$0"`] create_ec2_access_key(): Creating the EC2 access key \n"
   # Create the key in AWS
   aws ec2 create-key-pair --key-name $aws_ec2_access_key_name --output text> $aws_ec2_access_keyfile_name.tmp
