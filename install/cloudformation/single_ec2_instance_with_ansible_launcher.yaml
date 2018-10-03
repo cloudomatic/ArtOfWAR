@@ -53,7 +53,7 @@ Resources:
         Value: "Bar"
       UserData:
         Fn::Base64: !Sub |     # No more Fn::Join needed
-          #!/bin/bash
+          #!/bin/bash -xe
           # Note to user that this will log to /var/log/cloud-init-output.log
           # We want to bootstrap Ansible and Git in order to download and execute the playbook
           sudo pip install ansible

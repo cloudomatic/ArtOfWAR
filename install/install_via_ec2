@@ -43,7 +43,7 @@ create_ec2_access_key() {
     exit 1
   fi
 
-  if ! -r $aws_ec2_access_keyfile_name; then
+  if [ -r $aws_ec2_access_keyfile_name ]; then
     echo -e "\n\n [`basename "$0"`] create_ec2_access_key(): EC2 access keyfile detected, skipping new key creation \n"
     return
   fi
