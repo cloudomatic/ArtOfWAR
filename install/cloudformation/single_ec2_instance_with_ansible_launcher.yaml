@@ -22,6 +22,10 @@ Parameters:
     Description: The AMI to use
     Type: String
     Default: "ami-6b8cef13"
+  ConfigurationScript:
+    Description: The configuration routine (URL to a bash script) to execute for VM customization
+    Type: String
+    Default: ""
   SSHLocation:
     Description: The IP address range that can be used to SSH to the EC2 instances
     Type: String
@@ -55,11 +59,15 @@ Resources:
         Fn::Base64: !Sub |     # No more Fn::Join needed
           #!/bin/bash -xe
           # Note to user that this will log to /var/log/cloud-init-output.log
-          # We want to bootstrap Ansible and Git in order to download and execute the playbook
-          sudo pip install ansible
-          sudo yum install -y git
-          sudo -u ec2-user /usr/bin/git clone https://github.com/cloudomatic/ArtOfWar /home/ec2-user/ArtOfWar
-          sudo -u ec2-user /usr/local/bin/ansible-playbook /home/ec2-user/ArtOfWar/install/ansible/install.yaml -vvv >> /home/ec2-user/ansible_install.out 2>>  /home/ec2-user/ansible_install.err
+          echo "Running the configuration script:"
+          echo { "Ref" : "ConfigurationScript" } 
+          curl -O https://raw.githubusercontent.com/cloudomatic/ArtOfWAR/passing_parameters_to_userdata/install/configure_ec2_instance
+          chmod u+x ./configure_ec2_instance
+          ./configure_ec2_instance
+          #sudo pip install ansible
+          #sudo yum install -y git
+          #sudo -u ec2-user /usr/bin/git clone https://github.com/cloudomatic/ArtOfWar /home/ec2-user/ArtOfWar
+          #sudo -u ec2-user /usr/local/bin/ansible-playbook /home/ec2-user/ArtOfWar/install/ansible/install.yaml -vvv >> /home/ec2-user/ansible_install.out 2>>  /home/ec2-user/ansible_install.err
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
