@@ -59,15 +59,16 @@ Resources:
         Fn::Base64: !Sub |     # No more Fn::Join needed
           #!/bin/bash -xe
           # Note to user that this will log to /var/log/cloud-init-output.log
-          echo "Running the configuration script:"
-          echo { "Ref" : "ConfigurationScript" } 
-          curl -O https://raw.githubusercontent.com/cloudomatic/ArtOfWAR/passing_parameters_to_userdata/install/configure_ec2_instance
-          chmod u+x ./configure_ec2_instance
-          ./configure_ec2_instance
-          #sudo pip install ansible
-          #sudo yum install -y git
-          #sudo -u ec2-user /usr/bin/git clone https://github.com/cloudomatic/ArtOfWar /home/ec2-user/ArtOfWar
-          #sudo -u ec2-user /usr/local/bin/ansible-playbook /home/ec2-user/ArtOfWar/install/ansible/install.yaml -vvv >> /home/ec2-user/ansible_install.out 2>>  /home/ec2-user/ansible_install.err
+          echo "Executing UserData routine...."
+          echo "working directory: `pwd`"
+          echo "user: `whoami`"
+          configuration_script_url=${ConfigurationScript}
+          echo "url: $configuration_script_url"
+          configuration_script=`basename $configuration_script_url`
+          echo "script name: $configuration_script"
+          curl -O $configuration_script_url
+          chmod u+rx $configuration_script
+          ./$configuration_script
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
