@@ -11,20 +11,20 @@
     Click <a href="?startThreads=true">here</a> to start two logging threads in the cache local to this JVM.<br><br>
     Click <a href="?dumpCache=true">here</a> to show the contents of the local cache.<br><br>
     <%
-      if (request.getParameter("startThreads" != null) {
-        (new debug.io..cache.CacheUserThread("Thread1")).start();
-        (new debug.io.cache.CacheUserThread("Thread2")).start();
+      if (request.getParameter("startThreads") != null) {
+        (new io.debug.cache.CacheUserThread("Thread1")).start();
+        (new io.debug.cache.CacheUserThread("Thread2")).start();
       } else if (request.getParameter("putValue") != null) {
-        debug.io.cache.SimpleCache.getInstance().put(
+        io.debug.cache.SimpleCache.getInstance().put(
           request.getParameter("key"),
           request.getParameter("value")
         );
      }  else if (request.getParameter("dumpCache") != null) {
        out.println("Showing the cache contents...<br>");
        out.println("<pre>");
-       out.println(debug.io.cache.SimpleCache.getCacheContents());
+       out.println(io.debug.cache.SimpleCache.getCacheContents());
        // This dumps the contents to server.log
-       // debug.io.cache.SimpleCache.dumpCache();
+       // io.debug.cache.SimpleCache.dumpCache();
        out.println("</pre>");
      }
   %>

@@ -7,6 +7,9 @@
   </head>
 
   <body>
+    <h1>Host: <%= java.net.InetAddress.getLocalHost().getHostName() %> </h1><br>
+    <h1>IP:    <%= java.net.InetAddress.getLocalHost().getHostAddress() %></h1><br>
+    <br>
     <h1>HTTP Headers Received:</h1>
     <blockquote>
       <table border="1" cellpadding="1" cellspacing="0">
@@ -15,7 +18,7 @@
           while (listOfHeaderNames.hasMoreElements()) {
             String headerName = (String)listOfHeaderNames.nextElement();
             %>
-              <tr><td><%= headerName %></td><td><%= request.getHeader(mame) %></td></tr>
+              <tr><td><%= headerName %></td><td><%= request.getHeader(headerName) %></td></tr>
             <%
           }
         %>

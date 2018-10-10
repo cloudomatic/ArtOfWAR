@@ -6,10 +6,10 @@
 
   <body>
     <%
-      boolean weAreLoopingInTheHangCondition = false;
+      boolean weAreLoopingInTheHangCondition = true;
       while (weAreLoopingInTheHangCondition) {
         try {
-          Thread.currentThread.sleep(10000);
+          Thread.currentThread().sleep(10000);
         } catch (InterruptedException ie) {
           System.err.println("simulateHungApp.jsp: InterruptedException attempting to put the current thread to sleep");
         }
