@@ -2,6 +2,8 @@
 
 LOG=/var/log/configure_ec2_instance.log
 
+sudo touch $LOG
+sudo chown ec2-user $LOG
 echo " [`basename "$0"`]: Starting configuration routine" | tee -a $LOG
 sudo pip install ansible | tee -a $LOG
 sudo yum install -y git | tee -a $LOG
