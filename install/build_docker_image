@@ -1,0 +1,14 @@
+#!/bin/sh
+
+#
+# This program creates a local Docker image using the Dockerfile in docker/Dockerfile
+#
+
+mkdir _docker_build
+cd _docker_build
+cp ../docker/Dockerfile .
+cp ../../target/debug.war .
+docker build -t artofwar/artofwar .
+rm -rf _docker_build
+
+echo "To run, execute 'docker run -it --rm --name artofwar01 -p 8080:8080 artofwar/artofwar'"
